@@ -4,8 +4,8 @@
     "sand_colour" : [194, 178, 128],
 
     "screen_title" : "Sand Simulation",
-    "grid_size" : [50, 30],
-    "cell_size": 20,
+    "grid_size" : [100, 60],
+    "cell_size": 10,
     "cell_padding": 1,
     "screen_border" : [0, 0, 0, 0]
 }
