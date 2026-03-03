@@ -1,0 +1,10 @@
+{
+    "background_colour" : [44, 44, 44],
+    "empty_colour" : [50, 50, 50],
+    "sand_colour" : [194, 178, 128],
+
+    "screen_title" : "Sand Simulation",
+    "screen_size" : [800, 600],
+    "cell_size": 20,
+    "cell_padding": 1
+}
