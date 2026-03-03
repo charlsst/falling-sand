@@ -1,2 +1,4 @@
 # falling-sand
-A falling sand simulator using PyGame.
+![Work in Progress](https://img.shields.io/badge/status-wip-orange)
+
+A highly-customisable falling sand simulator using PyGame.
