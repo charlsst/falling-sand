@@ -1,54 +1,46 @@
 import random
-from custom_types import Position, Colour
+from custom_types import Colour
 from settings import Settings
+from sand import update_sand
 
 settings = Settings()
+RANDOMISE_COLOURS = settings.RANDOMISE_PARTICLE_COLOUR
+
+# [EMPTY, SAND]
 
 EMPTY = 0
+EMPTY_COLOUR = settings.PARTICLE_COLOURS[EMPTY]
+EMPTY_COLOURS_MAP = [EMPTY_COLOUR for i in range(settings.GRID_SIZE[0]*settings.GRID_SIZE[1])]
+
 SAND = 1
+SAND_COLOUR = settings.PARTICLE_COLOURS[SAND]
+SAND_COLOURS_MAP = [None for i in range(settings.GRID_SIZE[0]*settings.GRID_SIZE[1])]
 
-def get_particle_colour(particle_id : int, position : Position) -> Colour :
-    if particle_id == 0 :
-        return settings.EMPTY_COLOUR
-    if particle_id == 1 :
-        return randomise_colour(settings.SAND_COLOUR, position)
+COLOURS = [EMPTY_COLOUR, SAND_COLOUR]
+COLOURS_MAP = [EMPTY_COLOURS_MAP, SAND_COLOURS_MAP]
+UPDATES = [None, update_sand]
 
-def randomise_colour(base_colour_rgb : Colour, position : Position) -> Colour :
-        rng = random.Random(position[0] * 73856093 ^ position[1] * 19349663)
+def set_colour(i : int, particle_id : int) :
+    base_colour_rgb = COLOURS[particle_id]
+    if RANDOMISE_COLOURS[particle_id] :
+        grid_width = settings.GRID_SIZE[0]
+        grid_height = settings.GRID_SIZE[1]
+
+        x = i % grid_width
+        y = i // grid_height
+
+        rng = random.Random(x * 73856093 ^ y * 19349663)
 
         v = rng.randint(-10, 10)
         r = max(0, min(255, base_colour_rgb[0] + v))
         g = max(0, min(255, base_colour_rgb[1] + v))
         b = max(0, min(255, base_colour_rgb[2] + v))
-        return r, g, b
-
-def update_1(particle_position: Position, grid: list[int]) -> Position:
-    x, y = particle_position
-    width = settings.GRID_SIZE[0]
-    height = settings.GRID_SIZE[1]
-
-    new_y = y + 1
-
-    if new_y >= height:
-        return (x, y)
-
-    below = x + new_y * width
-
-    if grid[below] == 0:
-        return (x, new_y)
+        COLOURS_MAP[particle_id][i] = (r,g,b)
+        return (r,g,b)
+    else :
+        COLOURS_MAP[particle_id][i] = base_colour_rgb
+        return base_colour_rgb
     
-    if random.random() < 0.5:
-        offsets = (-1, 1)
-    else:
-        offsets = (1, -1)
-
-    for dx in offsets:
-        nx = x + dx
-
-        if 0 <= nx < width:
-            idx = nx + new_y * width
-
-            if grid[idx] == 0:
-                return (nx, new_y)
-
-    return (x, y)
+if RANDOMISE_COLOURS[0] :
+    for i in EMPTY_COLOURS_MAP :
+        set_colour(i, 0)

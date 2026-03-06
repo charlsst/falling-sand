@@ -7,8 +7,8 @@ class Settings :
 
         try :
             self.BACKGROUND_COLOUR = config_data["background_colour"]
-            self.EMPTY_COLOUR = config_data["empty_colour"]
-            self.SAND_COLOUR = config_data["sand_colour"]
+            self.PARTICLE_COLOURS = config_data["particle_colours"]
+            self.RANDOMISE_PARTICLE_COLOUR = config_data["randomise_particle_colour"]
             self.SCREEN_TITLE = config_data["screen_title"]
             self.GRID_SIZE = config_data["grid_size"]
             self.CELL_SIZE = config_data["cell_size"]
@@ -21,7 +21,7 @@ class Settings :
     
     def validate(self) :
         # Validate all colours
-        for colour in [self.BACKGROUND_COLOUR, self.EMPTY_COLOUR, self.SAND_COLOUR] :
+        for colour in self.PARTICLE_COLOURS :
             if not isinstance(colour, list) or len(colour) != 3:
                 raise ValueError("Colours must be a list of length 3.")
             else :
@@ -29,6 +29,13 @@ class Settings :
                     if num < 0 or num > 255 :
                         raise ValueError("Colours must contain integers from 0-255.")
 
+        # Validate randomise particle colour
+        for val in self.RANDOMISE_PARTICLE_COLOUR :
+            if isinstance(val, bool) :
+                if len(self.RANDOMISE_PARTICLE_COLOUR) != len(self.PARTICLE_COLOURS) :
+                    raise ValueError("Randomise colours must contain enough booleans for each colour.")
+            else :
+                raise ValueError("Randomise colours must contain only booleans.")
 
         # Validate SCREEN_TITLE
         if not isinstance(self.SCREEN_TITLE, str) :

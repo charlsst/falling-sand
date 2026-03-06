@@ -1,53 +1,65 @@
 import pygame
-from custom_types import Display, Position, Colour, Grid_Size
-from particle import get_particle_colour
+from custom_types import Display, Position
+from settings import Settings
+from particle import SAND, COLOURS_MAP, UPDATES, set_colour
 
 class Grid :
-    def __init__(self, grid_size : int,
-                 cell_size : int, cell_padding : int,
-                 top_padding : int, left_padding : int,
-                 empty_colour : Colour, sand_colour : Colour) :
-        self.rows = grid_size[1]
-        self.columns = grid_size[0]
-        self.cell_size = cell_size
-        self.cell_padding = cell_padding
-        self.top_padding = top_padding
-        self.left_padding = left_padding
+    def __init__(self, settings : Settings) :
+        self.settings = settings
+        self.grid_width = self.settings.GRID_SIZE[0]
+        self.grid_height = self.settings.GRID_SIZE[1]
+        self.cell_size = self.settings.CELL_SIZE
+        self.cell_padding = self.settings.CELL_PADDING
+        self.top_padding = self.settings.SCREEN_BORDER[0]
+        self.left_padding = self.settings.SCREEN_BORDER[1]
+    
+        self.grid = [0 for _ in range(self.grid_width*self.grid_height)]
 
-        self.cells = [0 for _ in range(self.rows*self.columns)]
+    # Updates every tile in the grid
+    def update(self) :
+        grid = self.grid
+        grid_width = self.grid_width
+        grid_height = self.grid_height
 
-        self.empty_colour = empty_colour
-        self.sand_colour = sand_colour
+        for y in range(grid_height -2, -1, -1) :
+            for x in range(grid_width) :
+                particle = grid[x + (y * grid_width)]
+                if particle != 0 :
+                    new_position = UPDATES[SAND]((x, y), grid)
+                    
+                    if new_position != (x, y) :
+                        self.set_cell(new_position, SAND)
+                        self.set_cell((x, y), 0)
+
+    def get_cell(self, position : Position) :
+        return self.grid[position[0] + (position[1] * self.grid_width)]
+
+    def set_cell(self, position : Position, particle_id : int) :
+        if 0 <= position[0] < self.grid_width and 0 <= position[1] < self.grid_height :
+            self.grid[position[0] + (position[1] * self.grid_width)] = particle_id
+
+    # Draws the grid to the screen
 
     def draw(self, screen : Display) :
-        for y in range(self.rows) :
-            for x in range(self.columns) :
-                colour = self.empty_colour
-                particle_id = self.cells[x + (y * self.columns)]
+        grid = self.grid
+        grid_width = self.grid_width
+        grid_height = self.grid_height
+
+        cell_padding = self.cell_padding
+        cell_size = self.cell_size
+        top_padding = self.top_padding
+        left_padding = self.left_padding
+
+        for y in range(grid_height) :
+            for x in range(grid_width) :
+                colour = COLOURS_MAP[0][x + (y * grid_width)]
+                particle_id = grid[x + (y * grid_width)]
                 if particle_id != 0 :
-                    colour = get_particle_colour(particle_id, (x,y))
+                    colour = COLOURS_MAP[particle_id][x + (y * grid_width)]
+                    if colour is None :
+                        colour = set_colour(x + (y * grid_width), particle_id)
                 
-                pygame.draw.rect(screen, colour, (x * (self.cell_size+self.cell_padding) + self.top_padding,
-                                                  y * (self.cell_size+self.cell_padding) + self.left_padding,
-                                                  self.cell_size,
-                                                  self.cell_size))
-                
-    def get_size(self) -> Grid_Size :
-        return (self.rows, self.columns)
-
-    def get_cell(self, position : Position) -> int :
-        if 0 <= position[0] < self.columns and 0 <= position[1] < self.rows :
-            return self.cells[position[0] + (position[1] * self.columns)]
-        return None
-    
-    def set_cell(self, position : Position, particle_id : int) :
-        if not(0 <= position[0] < self.columns and 0 <= position[1] < self.rows) :
-            return
-        self.cells[position[0] + (position[1] * self.columns)] = particle_id
-
-    def is_cell_empty(self, position : Position) -> bool :
-        return self.cells[position[0] + (position[1] * self.columns)] is None
-    
-    def contains_cell(self, position : Position) -> bool :
-        if 0 <= position[0] < self.columns and 0 <= position[1] < self.rows :
-            return True
+                pygame.draw.rect(screen, colour, (x * (cell_size+cell_padding) + top_padding,
+                                                  y * (cell_size+cell_padding) + left_padding,
+                                                  cell_size,
+                                                  cell_size))

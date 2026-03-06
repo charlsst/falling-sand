@@ -1,7 +1,7 @@
 import pygame
 import sys
 from settings import Settings
-from simulation import Simulation
+from grid import Grid
 from particle import SAND
 
 def main() :
@@ -12,7 +12,7 @@ def main() :
     pygame.display.set_caption(settings.SCREEN_TITLE)
 
     clock = pygame.time.Clock()
-    simulation = Simulation(settings)
+    grid = Grid(settings)
 
     while True: 
         # Read Events 
@@ -22,7 +22,7 @@ def main() :
                 sys.exit()
 
         # Update Simulation
-        simulation.update()
+        grid.update()
         
         # Check for Inputs
         buttons = pygame.mouse.get_pressed()
@@ -30,16 +30,16 @@ def main() :
             mouse_position = pygame.mouse.get_pos()
             mouse_x = (mouse_position[0] - settings.SCREEN_BORDER[1]) // (settings.CELL_SIZE + settings.CELL_PADDING)
             mouse_y = (mouse_position[1] - settings.SCREEN_BORDER[0]) // (settings.CELL_SIZE + settings.CELL_PADDING)
-            simulation.add_particle((mouse_x, mouse_y), SAND)
+            grid.set_cell((mouse_x, mouse_y), SAND)
         
 
         # Draw Graphics
         screen.fill(settings.BACKGROUND_COLOUR)
-        simulation.draw(screen)
+        grid.draw(screen)
 
         # Final Changes
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(120)
     
 if __name__ == "__main__" :
     main()
