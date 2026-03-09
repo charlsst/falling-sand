@@ -2,7 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from grid import Grid
-from particle import SAND
+from particle import EMPTY, SAND
 
 def main() :
     settings = Settings()
@@ -14,12 +14,19 @@ def main() :
     clock = pygame.time.Clock()
     grid = Grid(settings)
 
+    particleToDraw = EMPTY
+
     while True: 
         # Read Events 
         for event in pygame.event.get(): 
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT :
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN :
+                if event.key == pygame.K_0 :
+                    particleToDraw = EMPTY
+                if event.key == pygame.K_1 :
+                    particleToDraw = SAND
 
         # Update Simulation
         grid.update()
@@ -30,7 +37,9 @@ def main() :
             mouse_position = pygame.mouse.get_pos()
             mouse_x = (mouse_position[0] - settings.SCREEN_BORDER[1]) // (settings.CELL_SIZE + settings.CELL_PADDING)
             mouse_y = (mouse_position[1] - settings.SCREEN_BORDER[0]) // (settings.CELL_SIZE + settings.CELL_PADDING)
-            grid.set_cell((mouse_x, mouse_y), SAND)
+            grid.set_cell((mouse_x, mouse_y), particleToDraw)
+        
+        keys = pygame.key
         
 
         # Draw Graphics

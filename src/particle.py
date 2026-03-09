@@ -1,5 +1,4 @@
 import random
-from custom_types import Colour
 from settings import Settings
 from sand import update_sand
 
