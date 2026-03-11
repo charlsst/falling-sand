@@ -1,3 +1,4 @@
+import random
 import pygame
 from custom_types import Display, Position
 from settings import Settings
@@ -15,14 +16,21 @@ class Grid :
         self.scan_left = True
     
         self.grid = [0 for _ in range(self.grid_width*self.grid_height)]
+        self.next_grid = self.grid.copy()
         self.active_cells = []
-        self.next_active_cells = []
+        self.next_active_cells = set()
 
     # Updates every tile in the grid
     def update(self) :
         grid = self.grid
+        next_grid = self.next_grid
         grid_width = self.grid_width
-        self.next_active_cells = []
+
+        self.active_cells = list(self.next_active_cells)
+        self.active_cells.sort(key=lambda i : -(i // grid_width))
+
+        self.next_active_cells = set()
+
         for i in self.active_cells :
             particle = grid[i]
             if UPDATES[particle] is not None :
@@ -31,43 +39,48 @@ class Grid :
                 new_positions = UPDATES[particle]((x, y), grid)
                 for new_position in new_positions :
                     self.set_cell(new_position[0], new_position[1])
-                    if new_position[1] != 0 and i not in self.next_active_cells :
-                        self.next_active_cells.append(i)
-        self.active_cells = self.next_active_cells
+        
+        self.grid = next_grid
 
     def get_cell(self, position : Position) :
         return self.grid[position[0] + (position[1] * self.grid_width)]
 
     def set_cell(self, position : Position, particle_id : int) :
-        x = position[0]
-        y = position[1]
+        x, y = position[0], position[1]
         if 0 <= x < self.grid_width and 0 <= y < self.grid_height :
             i = x + (y * self.grid_width)
-            self.grid[i] = particle_id
+            self.next_grid[i] = particle_id
 
-            if particle_id != 0 and i not in self.next_active_cells :
-                self.next_active_cells.append(i)
+            if particle_id != 0 :
+                self.next_active_cells.add(i)
+    
+    def activate_neighbors(self, x, y) :
+        width, height = self.grid_width, self.grid_height
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < width and 0 <= ny < height:
+                    index = nx + ny * width
+                    self.next_active_cells.add(index)
 
     # Draws the grid to the screen
 
     def draw(self, screen : Display) :
         grid = self.grid
-        grid_width = self.grid_width
-        grid_height = self.grid_height
+        grid_width, grid_height = self.grid_width, self.grid_height
 
-        cell_padding = self.cell_padding
-        cell_size = self.cell_size
-        top_padding = self.top_padding
-        left_padding = self.left_padding
+        cell_padding, cell_size = self.cell_padding, self.cell_size
+        top_padding, left_padding = self.top_padding, self.left_padding
 
         for y in range(grid_height) :
             for x in range(grid_width) :
-                colour = COLOURS_MAP[0][x + (y * grid_width)]
-                particle_id = grid[x + (y * grid_width)]
+                i = x + (y * grid_width)
+                colour = COLOURS_MAP[0][i]
+                particle_id = grid[i]
                 if particle_id != 0 :
-                    colour = COLOURS_MAP[particle_id][x + (y * grid_width)]
+                    colour = COLOURS_MAP[particle_id][i]
                     if colour is None :
-                        colour = set_colour(x + (y * grid_width), particle_id)
+                        colour = set_colour(i, particle_id)
                 
                 pygame.draw.rect(screen, colour, (x * (cell_size+cell_padding) + top_padding,
                                                   y * (cell_size+cell_padding) + left_padding,

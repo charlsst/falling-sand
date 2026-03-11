@@ -7,5 +7,6 @@
     "grid_size" : [128, 72],
     "cell_size": 10,
     "cell_padding": 0,
-    "screen_border" : [0, 0, 0, 0]
+    "screen_border" : [0, 0, 0, 0],
+    "target_fps" : 60
 }

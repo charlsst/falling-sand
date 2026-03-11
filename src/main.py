@@ -49,7 +49,7 @@ def main() :
 
         # Final Changes
         pygame.display.flip()
-        clock.tick()
+        clock.tick(settings.TARGET_FPS)
     
 if __name__ == "__main__" :
     main()

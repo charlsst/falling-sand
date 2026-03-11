@@ -14,6 +14,7 @@ class Settings :
             self.CELL_SIZE = config_data["cell_size"]
             self.CELL_PADDING = config_data["cell_padding"]
             self.SCREEN_BORDER = config_data["screen_border"]
+            self.TARGET_FPS = config_data["target_fps"]
         except KeyError as e :
             raise KeyError(f"Missing config key for settings initialisation: {e.args[0]}")
 
@@ -62,3 +63,7 @@ class Settings :
         for edge in self.SCREEN_BORDER :
             if not isinstance(edge, int) or edge < 0 :
                 raise ValueError("SCREEN_BORDER values must be non-negative integers.")
+        
+        # Validate TARGET_FPS
+        if not isinstance(self.TARGET_FPS, int) or self.TARGET_FPS < 0:
+            raise ValueError("TARGET_FPS must be a non-negative integer.")
