@@ -2,7 +2,7 @@ import pygame
 import sys
 from settings import Settings
 from grid import Grid
-from particle import EMPTY, SAND
+from particle import EMPTY, SAND, ROCK, WATER
 
 def main() :
     settings = Settings()
@@ -27,6 +27,10 @@ def main() :
                     particleToDraw = EMPTY
                 if event.key == pygame.K_1 :
                     particleToDraw = SAND
+                if event.key == pygame.K_2 :
+                    particleToDraw = ROCK
+                if event.key == pygame.K_3 :
+                    particleToDraw = WATER
 
         # Update Simulation
         grid.update()
@@ -39,16 +43,13 @@ def main() :
             mouse_y = (mouse_position[1] - settings.SCREEN_BORDER[0]) // (settings.CELL_SIZE + settings.CELL_PADDING)
             grid.set_cell((mouse_x, mouse_y), particleToDraw)
         
-        keys = pygame.key
-        
-
         # Draw Graphics
         screen.fill(settings.BACKGROUND_COLOUR)
         grid.draw(screen)
 
         # Final Changes
         pygame.display.flip()
-        clock.tick(120)
+        clock.tick()
     
 if __name__ == "__main__" :
     main()
