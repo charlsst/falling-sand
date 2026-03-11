@@ -53,6 +53,5 @@ if RANDOMISE_COLOURS[0] :
     for i in EMPTY_COLOURS_MAP :
         set_colour(i, 0)
 else :
-    print("doing")
     EMPTY_COLOURS_MAP = [EMPTY_COLOUR for i in range(settings.GRID_SIZE[0]*settings.GRID_SIZE[1])]
     COLOURS_MAP[0] = EMPTY_COLOURS_MAP

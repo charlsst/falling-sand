@@ -12,30 +12,41 @@ class Grid :
         self.cell_padding = self.settings.CELL_PADDING
         self.top_padding = self.settings.SCREEN_BORDER[0]
         self.left_padding = self.settings.SCREEN_BORDER[1]
+        self.scan_left = True
     
         self.grid = [0 for _ in range(self.grid_width*self.grid_height)]
+        self.active_cells = []
+        self.next_active_cells = []
 
     # Updates every tile in the grid
     def update(self) :
         grid = self.grid
         grid_width = self.grid_width
-        grid_height = self.grid_height
-
-        for y in range(grid_height -2, -1, -1) :
-            for x in range(grid_width) :
-                particle = grid[x + (y * grid_width)]
-                if UPDATES[particle] is not None :
-                    new_positions = UPDATES[particle]((x, y), grid)
-
-                    for new_position in new_positions :
-                        self.set_cell(new_position[0], new_position[1])
+        self.next_active_cells = []
+        for i in self.active_cells :
+            particle = grid[i]
+            if UPDATES[particle] is not None :
+                y = i // grid_width
+                x = i - y * grid_width
+                new_positions = UPDATES[particle]((x, y), grid)
+                for new_position in new_positions :
+                    self.set_cell(new_position[0], new_position[1])
+                    if new_position[1] != 0 and i not in self.next_active_cells :
+                        self.next_active_cells.append(i)
+        self.active_cells = self.next_active_cells
 
     def get_cell(self, position : Position) :
         return self.grid[position[0] + (position[1] * self.grid_width)]
 
     def set_cell(self, position : Position, particle_id : int) :
-        if 0 <= position[0] < self.grid_width and 0 <= position[1] < self.grid_height :
-            self.grid[position[0] + (position[1] * self.grid_width)] = particle_id
+        x = position[0]
+        y = position[1]
+        if 0 <= x < self.grid_width and 0 <= y < self.grid_height :
+            i = x + (y * self.grid_width)
+            self.grid[i] = particle_id
+
+            if particle_id != 0 and i not in self.next_active_cells :
+                self.next_active_cells.append(i)
 
     # Draws the grid to the screen
 

@@ -43,16 +43,13 @@ def main() :
             mouse_y = (mouse_position[1] - settings.SCREEN_BORDER[0]) // (settings.CELL_SIZE + settings.CELL_PADDING)
             grid.set_cell((mouse_x, mouse_y), particleToDraw)
         
-        keys = pygame.key
-        
-
         # Draw Graphics
         screen.fill(settings.BACKGROUND_COLOUR)
         grid.draw(screen)
 
         # Final Changes
         pygame.display.flip()
-        clock.tick(120)
+        clock.tick()
     
 if __name__ == "__main__" :
     main()
